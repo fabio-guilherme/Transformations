@@ -115,7 +115,7 @@ public class PyramidObject : MonoBehaviour
         // Add a Mesh Renderer component to the Mesh object
         MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
-        // Create a new material that uses a green color
+        // Create a new material that uses a grey color
         Material material = new Material(Shader.Find("Standard"));
         material.color = Color.grey;
 
