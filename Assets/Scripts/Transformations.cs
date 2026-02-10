@@ -81,4 +81,28 @@ public class Transformations : MonoBehaviour
         }
         return result;
     }
+
+    /// <summary>
+    /// Applies a 2D homogeneous transformation matrix to a point.
+    /// 
+    /// IMPORTANT:
+    /// - The point is treated as (x, y, 1) in homogeneous coordinates,
+    ///   so translation works correctly.
+    /// - The Vector3.z component is NOT used as the homogeneous w.
+    ///   It is preserved as the geometric depth (plane position).
+    /// 
+    /// This avoids mixing geometric z with homogeneous w, which would
+    /// cause translations to stop working when z != 1.
+    /// </summary>
+    /// <param name="matrix"></param>
+    /// <param name="point"></param>
+    /// <returns>The transformed vector.</returns>
+    public Vector3 multiplyHM2D(float[,] matrix, Vector3 point)
+    {
+        float x = point.x, y = point.y;
+        float newX = matrix[0, 0] * x + matrix[0, 1] * y + matrix[0, 2] * 1f;
+        float newY = matrix[1, 0] * x + matrix[1, 1] * y + matrix[1, 2] * 1f;
+        return new Vector3(newX, newY, point.z);
+    }
+
 }

@@ -185,7 +185,7 @@ public class TriangleMesh : Transformations
         mat[2, 0] = 0; mat[2, 1] = 0; mat[2, 2] = 1;
         for (int i = 0; i < vertices.Length; i++)
         {
-            vertices[i] = multiply(mat, vertices[i]);
+            vertices[i] = multiplyHM2D(mat, vertices[i]);
         }
         mesh.vertices = vertices;
     }
@@ -198,7 +198,7 @@ public class TriangleMesh : Transformations
         mat[2, 0] = 0; mat[2, 1] = 0; mat[2, 2] = 1;
         for (int i = 0; i < vertices.Length; i++)
         {
-            vertices[i] = multiply(mat, vertices[i]);
+            vertices[i] = multiplyHM2D(mat, vertices[i]);
         }
         mesh.vertices = vertices;
     }
@@ -211,7 +211,7 @@ public class TriangleMesh : Transformations
         mat[2, 0] = 0; mat[2, 1] = 0; mat[2, 2] = 1;
         for (int i = 0; i < vertices.Length; i++)
         {
-            vertices[i] = multiply(mat, vertices[i]);
+            vertices[i] = multiplyHM2D(mat, vertices[i]);
         }
         mesh.vertices = vertices;
     }
