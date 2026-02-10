@@ -48,6 +48,10 @@ public class TriangleMesh : Transformations
 
         // Assign the material to the Mesh object
         meshRenderer.material = material;
+
+        // Required for correct lighting when using lit shaders
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
     }
 
     void Update()
