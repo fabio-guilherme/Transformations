@@ -54,6 +54,10 @@ public class SquareObject : Transformations
 
         // Assign the material to the Mesh object
         meshRenderer.material = material;
+
+        // Required for correct lighting when using lit shaders
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
     }
 
     void Update()
@@ -117,7 +121,7 @@ public class SquareObject : Transformations
         float[,] finalmat = invert ? multiply(rmat, smat) : multiply(smat, rmat);
         for (int i = 0; i < vertices.Length; i++)
         {
-            vertices[i] = multiply(finalmat, vertices[i]);
+            vertices[i] = multiplyHM2D(finalmat, vertices[i]);
         }
         mesh.vertices = vertices;
     }
@@ -139,7 +143,7 @@ public class SquareObject : Transformations
         float[,] finalmat = multiply(multiply(t2mat, rmat), t1mat);
         for (int i = 0; i < vertices.Length; i++)
         {
-            vertices[i] = multiply(finalmat, vertices[i]);
+            vertices[i] = multiplyHM2D(finalmat, vertices[i]);
         }
         mesh.vertices = vertices;
     }
