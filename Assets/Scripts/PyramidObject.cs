@@ -202,7 +202,7 @@ public class PyramidObject : MonoBehaviour
         for (int i = 0; i < vertices.Length; i++)
         {
             vertices[i] = rxmat.MultiplyPoint(vertices[i]);
-            normals[i] = rxmat.MultiplyPoint(normals[i]);
+            normals[i] = rxmat.MultiplyVector(normals[i]);
         }
         mesh.vertices = vertices;
         mesh.normals = normals;
@@ -218,7 +218,7 @@ public class PyramidObject : MonoBehaviour
         for (int i = 0; i < vertices.Length; i++)
         {
             vertices[i] = rymat.MultiplyPoint(vertices[i]);
-            normals[i] = rymat.MultiplyPoint(normals[i]);
+            normals[i] = rymat.MultiplyVector(normals[i]);
         }
         mesh.vertices = vertices;
         mesh.normals = normals;
@@ -234,7 +234,7 @@ public class PyramidObject : MonoBehaviour
         for (int i = 0; i < vertices.Length; i++)
         {
             vertices[i] = rzmat.MultiplyPoint(vertices[i]);
-            normals[i] = rzmat.MultiplyPoint(normals[i]);
+            normals[i] = rzmat.MultiplyVector(normals[i]);
         }
         mesh.vertices = vertices;
         mesh.normals = normals;
