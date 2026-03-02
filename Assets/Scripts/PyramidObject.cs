@@ -9,7 +9,12 @@ public enum Transformation3D
     Scaling3D,
     RotationX3D,
     RotationY3D,
-    RotationZ3D
+    RotationZ3D,
+
+    // Exercise 3: rotate around a specific position (pivot)
+    RotationAroundPointX3D,
+    RotationAroundPointY3D,
+    RotationAroundPointZ3D
 }
 
 public class PyramidObject : MonoBehaviour
@@ -21,7 +26,15 @@ public class PyramidObject : MonoBehaviour
     public Transformation3D transformation3D;
     public bool decrease = false;
 
-    // Start is called before the first frame update
+    // Debug / teaching helpers
+    [Header("Exercise 3 (Rotate Around Point)")]
+    public bool useCentroidAsPivot = true;
+    public Vector3 customPivot = Vector3.zero;
+    public bool drawPivotGizmo = true;
+    public float pivotGizmoRadius = 0.75f;
+
+    private Vector3 pivotDebug;
+
     void Start()
     {
         // Create mesh
@@ -30,53 +43,53 @@ public class PyramidObject : MonoBehaviour
         mesh.name = "MyMesh";
 
         vertices = new Vector3[18];
-        //back triangle vertices
+        // back triangle vertices
         vertices[0] = new Vector3(-10, 0, -10);
         vertices[1] = new Vector3(10, 0, -10);
         vertices[2] = new Vector3(0, 10, 0);
-        //front triangle vertices
+        // front triangle vertices
         vertices[3] = new Vector3(-10, 0, 10);
         vertices[4] = new Vector3(10, 0, 10);
         vertices[5] = new Vector3(0, 10, 0);
-        //left triangle vertices
+        // left triangle vertices
         vertices[6] = new Vector3(-10, 0, 10);
         vertices[7] = new Vector3(-10, 0, -10);
         vertices[8] = new Vector3(0, 10, 0);
-        //right triangle vertices
+        // right triangle vertices
         vertices[9] = new Vector3(10, 0, 10);
         vertices[10] = new Vector3(10, 0, -10);
         vertices[11] = new Vector3(0, 10, 0);
-        //botton triangle 1 vertices
+        // bottom triangle 1 vertices
         vertices[12] = new Vector3(-10, 0, -10);
         vertices[13] = new Vector3(10, 0, -10);
         vertices[14] = new Vector3(-10, 0, 10);
-        //botton triangle 2 vertices
+        // bottom triangle 2 vertices
         vertices[15] = new Vector3(10, 0, 10);
         vertices[16] = new Vector3(10, 0, -10);
         vertices[17] = new Vector3(-10, 0, 10);
 
         int[] triangles = new int[18];
-        //back triangle
+        // back triangle
         triangles[0] = 0;
         triangles[1] = 2;
         triangles[2] = 1;
-        //front triangle
+        // front triangle
         triangles[3] = 4;
         triangles[4] = 5;
         triangles[5] = 3;
-        //left triangle
+        // left triangle
         triangles[6] = 6;
         triangles[7] = 8;
         triangles[8] = 7;
-        //right triangle
+        // right triangle
         triangles[9] = 10;
         triangles[10] = 11;
         triangles[11] = 9;
-        //bottom triangle 1
+        // bottom triangle 1
         triangles[12] = 13;
         triangles[13] = 14;
         triangles[14] = 12;
-        //bottom triangle 2
+        // bottom triangle 2
         triangles[15] = 15;
         triangles[16] = 17;
         triangles[17] = 16;
@@ -107,7 +120,7 @@ public class PyramidObject : MonoBehaviour
         normals[16] = Vector3.down;
         normals[17] = Vector3.down;
 
-        //Update mesh
+        // Update mesh
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.normals = normals;
@@ -121,9 +134,11 @@ public class PyramidObject : MonoBehaviour
 
         // Assign the material to the Mesh object
         meshRenderer.material = material;
+
+        // Initialize pivot debug
+        pivotDebug = GetPivot();
     }
 
-    // Update is called once per frame
     void Update()
     {
         float factor;
@@ -159,9 +174,47 @@ public class PyramidObject : MonoBehaviour
                     RotateZ3D(factor * 20 * Mathf.Deg2Rad * Time.deltaTime);
                     break;
                 }
-            default: break;
-        }
 
+            // Exercise 3: rotate around a pivot (centroid or custom point)
+            case Transformation3D.RotationAroundPointX3D:
+                {
+                    factor = decrease ? -1.0f : 1.0f;
+                    Vector3 pivot = GetPivot();
+                    RotateAroundPointX3D(pivot, factor * 20 * Mathf.Deg2Rad * Time.deltaTime);
+                    break;
+                }
+            case Transformation3D.RotationAroundPointY3D:
+                {
+                    factor = decrease ? -1.0f : 1.0f;
+                    Vector3 pivot = GetPivot();
+                    RotateAroundPointY3D(pivot, factor * 20 * Mathf.Deg2Rad * Time.deltaTime);
+                    break;
+                }
+            case Transformation3D.RotationAroundPointZ3D:
+                {
+                    factor = decrease ? -1.0f : 1.0f;
+                    Vector3 pivot = GetPivot();
+                    RotateAroundPointZ3D(pivot, factor * 20 * Mathf.Deg2Rad * Time.deltaTime);
+                    break;
+                }
+
+            default:
+                break;
+        }
+    }
+
+    private Vector3 GetPivot()
+    {
+        pivotDebug = useCentroidAsPivot ? ComputeCentroid() : customPivot;
+        return pivotDebug;
+    }
+
+    private Vector3 ComputeCentroid()
+    {
+        Vector3 c = Vector3.zero;
+        for (int i = 0; i < vertices.Length; i++)
+            c += vertices[i];
+        return c / vertices.Length;
     }
 
     void Translate3D(float tx, float ty, float tz)
@@ -171,24 +224,26 @@ public class PyramidObject : MonoBehaviour
         translation_matrix.SetRow(1, new Vector4(0f, 1f, 0f, ty));
         translation_matrix.SetRow(2, new Vector4(0f, 0f, 1f, tz));
         translation_matrix.SetRow(3, new Vector4(0f, 0f, 0f, 1f));
+
         for (int i = 0; i < vertices.Length; i++)
-        {
-            vertices[i] = translation_matrix.MultiplyPoint(vertices[i]);
-        }
+            vertices[i] = translation_matrix.MultiplyPoint3x4(vertices[i]);
+
         mesh.vertices = vertices;
     }
 
     void Scale3D(float sx, float sy, float sz)
     {
         Matrix4x4 scale_matrix = new Matrix4x4();
-        scale_matrix.SetRow(0, new Vector4(sx, 0f, 0f, 0));
-        scale_matrix.SetRow(1, new Vector4(0f, sy, 0f, 0));
-        scale_matrix.SetRow(2, new Vector4(0f, 0f, sz, 0));
+        scale_matrix.SetRow(0, new Vector4(sx, 0f, 0f, 0f));
+        scale_matrix.SetRow(1, new Vector4(0f, sy, 0f, 0f));
+        scale_matrix.SetRow(2, new Vector4(0f, 0f, sz, 0f));
         scale_matrix.SetRow(3, new Vector4(0f, 0f, 0f, 1f));
+
         for (int i = 0; i < vertices.Length; i++)
-        {
-            vertices[i] = scale_matrix.MultiplyPoint(vertices[i]);
-        }
+            vertices[i] = scale_matrix.MultiplyPoint3x4(vertices[i]);
+
+        // If you later add non-uniform scaling, normals should be transformed
+        // by the inverse-transpose normal matrix. For now, keep as-is.
         mesh.vertices = vertices;
     }
 
@@ -199,11 +254,14 @@ public class PyramidObject : MonoBehaviour
         rxmat.SetRow(1, new Vector4(0f, Mathf.Cos(angle), -Mathf.Sin(angle), 0f));
         rxmat.SetRow(2, new Vector4(0f, Mathf.Sin(angle), Mathf.Cos(angle), 0f));
         rxmat.SetRow(3, new Vector4(0f, 0f, 0f, 1f));
+
         for (int i = 0; i < vertices.Length; i++)
-        {
-            vertices[i] = rxmat.MultiplyPoint(vertices[i]);
-            normals[i] = rxmat.MultiplyVector(normals[i]);
-        }
+            vertices[i] = rxmat.MultiplyPoint3x4(vertices[i]);
+
+        // Normals are directions (w=0): use MultiplyVector, not MultiplyPoint
+        for (int i = 0; i < normals.Length; i++)
+            normals[i] = rxmat.MultiplyVector(normals[i]).normalized;
+
         mesh.vertices = vertices;
         mesh.normals = normals;
     }
@@ -215,11 +273,13 @@ public class PyramidObject : MonoBehaviour
         rymat.SetRow(1, new Vector4(0f, 1f, 0f, 0f));
         rymat.SetRow(2, new Vector4(-Mathf.Sin(angle), 0f, Mathf.Cos(angle), 0f));
         rymat.SetRow(3, new Vector4(0f, 0f, 0f, 1f));
+
         for (int i = 0; i < vertices.Length; i++)
-        {
-            vertices[i] = rymat.MultiplyPoint(vertices[i]);
-            normals[i] = rymat.MultiplyVector(normals[i]);
-        }
+            vertices[i] = rymat.MultiplyPoint3x4(vertices[i]);
+
+        for (int i = 0; i < normals.Length; i++)
+            normals[i] = rymat.MultiplyVector(normals[i]).normalized;
+
         mesh.vertices = vertices;
         mesh.normals = normals;
     }
@@ -231,24 +291,67 @@ public class PyramidObject : MonoBehaviour
         rzmat.SetRow(1, new Vector4(Mathf.Sin(angle), Mathf.Cos(angle), 0f, 0f));
         rzmat.SetRow(2, new Vector4(0f, 0f, 1f, 0f));
         rzmat.SetRow(3, new Vector4(0f, 0f, 0f, 1f));
+
         for (int i = 0; i < vertices.Length; i++)
-        {
-            vertices[i] = rzmat.MultiplyPoint(vertices[i]);
-            normals[i] = rzmat.MultiplyVector(normals[i]);
-        }
+            vertices[i] = rzmat.MultiplyPoint3x4(vertices[i]);
+
+        for (int i = 0; i < normals.Length; i++)
+            normals[i] = rzmat.MultiplyVector(normals[i]).normalized;
+
         mesh.vertices = vertices;
         mesh.normals = normals;
     }
 
-    // Visualise the normals
-    private void OnDrawGizmos()
+    // Exercise 3: rotate around a specific point (pivot) on each axis.
+    // M = T(pivot) * R(axis, angle) * T(-pivot)
+    void RotateAroundPointX3D(Vector3 pivot, float angle)
     {
-        if (vertices == null) return;
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawRay(vertices[i], normals[i]);
-        }
+        ApplyRotateAroundPoint(pivot, Quaternion.AngleAxis(angle * Mathf.Rad2Deg, Vector3.right));
     }
 
+    void RotateAroundPointY3D(Vector3 pivot, float angle)
+    {
+        ApplyRotateAroundPoint(pivot, Quaternion.AngleAxis(angle * Mathf.Rad2Deg, Vector3.up));
+    }
+
+    void RotateAroundPointZ3D(Vector3 pivot, float angle)
+    {
+        ApplyRotateAroundPoint(pivot, Quaternion.AngleAxis(angle * Mathf.Rad2Deg, Vector3.forward));
+    }
+
+    private void ApplyRotateAroundPoint(Vector3 pivot, Quaternion q)
+    {
+        // Composite transform for points: T(p) * R * T(-p)
+        Matrix4x4 T1 = Matrix4x4.Translate(-pivot);
+        Matrix4x4 R = Matrix4x4.Rotate(q);
+        Matrix4x4 T2 = Matrix4x4.Translate(pivot);
+        Matrix4x4 M = T2 * R * T1;
+
+        for (int i = 0; i < vertices.Length; i++)
+            vertices[i] = M.MultiplyPoint3x4(vertices[i]);
+
+        // Normals: only rotate (no translation)
+        Matrix4x4 Ronly = Matrix4x4.Rotate(q);
+        for (int i = 0; i < normals.Length; i++)
+            normals[i] = Ronly.MultiplyVector(normals[i]).normalized;
+
+        mesh.vertices = vertices;
+        mesh.normals = normals;
+    }
+
+    // Visualise the normals (and optionally the pivot)
+    private void OnDrawGizmos()
+    {
+        if (vertices == null || normals == null) return;
+
+        Gizmos.color = Color.yellow;
+        for (int i = 0; i < vertices.Length; i++)
+            Gizmos.DrawRay(vertices[i], normals[i]);
+
+        if (drawPivotGizmo)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(pivotDebug, pivotGizmoRadius);
+        }
+    }
 }
