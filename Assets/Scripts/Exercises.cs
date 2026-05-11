@@ -13,7 +13,7 @@ public enum ExerciseTransformation
 
 public class Exercises : Transformations
 {
-    public float angleInDegrees;
+    public float shearingFactor;                    //public float angleInDegrees;
 
     private Mesh mesh;
     private Vector3[] vertices;
@@ -29,7 +29,7 @@ public class Exercises : Transformations
 
     void Start()
     {
-        angleInDegrees = 45f;
+        shearingFactor = 1f;                        //angleInDegrees = 45f;
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
         mesh.name = "MyMesh";
@@ -72,12 +72,12 @@ public class Exercises : Transformations
                     }
                 case ExerciseTransformation.ShearingX:
                     {
-                        ShearingX(angleInDegrees * Mathf.Deg2Rad);
+                        ShearingX(shearingFactor);  //ShearingX(angleInDegrees * Mathf.Deg2Rad);
                         break;
                     }
                 case ExerciseTransformation.ShearingY:
                     {
-                        ShearingY(angleInDegrees * Mathf.Deg2Rad);
+                        ShearingY(shearingFactor);  //ShearingY(angleInDegrees * Mathf.Deg2Rad);
                         break;
                     }
                 default: break;
@@ -131,14 +131,30 @@ public class Exercises : Transformations
         InvertTriangles();
     }
 
-    void ShearingX(float angle)
+    void ShearingX(float shearingFactor)            //void ShearingX(float angle)
     {
-        //Exercise
+        // Exercise
+        float[,] mat = new float[2, 2];
+        mat[0, 0] = 1; mat[0, 1] = shearingFactor;  //mat[0, 0] = 1; mat[0, 1] = angle + 0 * Mathf.Tan(angle);
+        mat[1, 0] = 0; mat[1, 1] = 1;
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            vertices[i] = multiply(mat, vertices[i]);
+        }
+        mesh.vertices = vertices;
     }
 
-    void ShearingY(float angle)
+    void ShearingY(float shearingFactor)            //void ShearingY(float angle)
     {
-        //Exercise
+        // Exercise
+        float[,] mat = new float[2, 2];
+        mat[0, 0] = 1; mat[0, 1] = 0;
+        mat[1, 0] = shearingFactor; mat[1, 1] = 1;  //mat[1, 0] = angle + 0 * Mathf.Tan(angle); mat[1, 1] = 1;
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            vertices[i] = multiply(mat, vertices[i]);
+        }
+        mesh.vertices = vertices;
     }
 
     // This is necessary because, after the reflection, the camera will be facing the back side
