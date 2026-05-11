@@ -134,27 +134,13 @@ public class Exercises : Transformations
     void ShearingX(float shearingFactor)            //void ShearingX(float angle)
     {
         // Exercise
-        float[,] mat = new float[2, 2];
-        mat[0, 0] = 1; mat[0, 1] = shearingFactor;  //mat[0, 0] = 1; mat[0, 1] = angle + 0 * Mathf.Tan(angle);
-        mat[1, 0] = 0; mat[1, 1] = 1;
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            vertices[i] = multiply(mat, vertices[i]);
-        }
-        mesh.vertices = vertices;
+
     }
 
     void ShearingY(float shearingFactor)            //void ShearingY(float angle)
     {
         // Exercise
-        float[,] mat = new float[2, 2];
-        mat[0, 0] = 1; mat[0, 1] = 0;
-        mat[1, 0] = shearingFactor; mat[1, 1] = 1;  //mat[1, 0] = angle + 0 * Mathf.Tan(angle); mat[1, 1] = 1;
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            vertices[i] = multiply(mat, vertices[i]);
-        }
-        mesh.vertices = vertices;
+
     }
 
     // This is necessary because, after the reflection, the camera will be facing the back side
