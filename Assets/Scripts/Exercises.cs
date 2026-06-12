@@ -135,7 +135,7 @@ public class Exercises : Transformations
     {
         // Exercise
         float[,] mat = new float[2, 2];
-        mat[0, 0] = 1; mat[0, 1] = shearingFactor;  //mat[0, 0] = 1; mat[0, 1] = angle + 0 * Mathf.Tan(angle);
+        mat[0, 0] = 1; mat[0, 1] = shearingFactor;  //mat[0, 0] = 1; mat[0, 1] = Mathf.Tan(angle);
         mat[1, 0] = 0; mat[1, 1] = 1;
         for (int i = 0; i < vertices.Length; i++)
         {
@@ -149,7 +149,7 @@ public class Exercises : Transformations
         // Exercise
         float[,] mat = new float[2, 2];
         mat[0, 0] = 1; mat[0, 1] = 0;
-        mat[1, 0] = shearingFactor; mat[1, 1] = 1;  //mat[1, 0] = angle + 0 * Mathf.Tan(angle); mat[1, 1] = 1;
+        mat[1, 0] = shearingFactor; mat[1, 1] = 1;  //mat[1, 0] = Mathf.Tan(angle); mat[1, 1] = 1;
         for (int i = 0; i < vertices.Length; i++)
         {
             vertices[i] = multiply(mat, vertices[i]);
